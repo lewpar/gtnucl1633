@@ -1,11 +1,19 @@
 # GTNUCL1633 Fingerprint Reader
-This repo contains a basic module for interacting with the GT-NUCL1633 Fingerprint Reader.
+A Python module implementation of the GTNUCL1633 Fingerprint Reader.
 
-Currently supported features:
-- Initialize (Open) Reader
-- Terminate (Close) Reader
-- Get unused user id (Used for training fingerprints)
-- Switch LED On/Off
+## Supported Commands
+- [x] CMD_OPEN
+- [x] CMD_CLOSE
+- [x] CMD_LED_CONTROL
+- [x] CMD_IS_PRESS_FINGER
+- [] CMD_ENROLL
+- [] CMD_DELETE_ID
+- [] CMD_DELETE_ALL
+- [] CMD_GET_USER_COUNT
+- [] CMD_IDENTIFY
+- [x] CMD_GET_ENTRY_ID
+- [] CMD_GET_FIRMWARE_VERSION
+- [] CMD_ENROLL_CANCEL
 
 For any unimplemented features you can use `send_command` and `read_response` to fill the gaps.
 
