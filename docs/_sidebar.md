@@ -1,3 +1,3 @@
-- [Home](/#/README)
-- [Page 1](/#/page1)
-- [Page 2](/#/page2)
+- [Overview & Usage](/overview)
+- [API Reference](/api-reference)
+- [Command Reference](/command-reference)

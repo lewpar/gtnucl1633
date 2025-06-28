@@ -2,17 +2,21 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>GTNUCL1633 Wiki</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="//unpkg.com/docsify/lib/docsify.min.js"></script>
+  <title>GTNUCL1633 Wiki</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify/themes/vue.css">
 </head>
 <body>
   <div id="app">Loading...</div>
+
   <script>
     window.$docsify = {
       name: 'GTNUCL1633 Wiki',
-      loadSidebar: true
-    }
+      repo: 'https://github.com/lewpar/gtnucl1633',
+      loadSidebar: true,
+      homepage: 'overview.md'
+    };
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify/lib/docsify.min.js"></script>
 </body>
 </html>

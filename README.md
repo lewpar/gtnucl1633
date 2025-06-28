@@ -1,27 +1,21 @@
 # GTNUCL1633 Fingerprint Reader
-Python driver for the GTNUCL1633 Fingerprint Reader.
+
+A Python driver for the GTNUCL1633 Fingerprint Reader.
+
+## Features
+- Easy-to-use Python interface for the GTNUCL1633 sensor
+- Fingerprint enrollment, identification, and management
+- LED and UART control
+- Access to firmware and sensor information
 
 ## Usage
-Checkout [main.py](./main.py) for basic usage.
+See [main.py](./main.py) for a basic usage example.
 
-## Supported Commands
-- [x] CMD_OPEN
-- [x] CMD_CLOSE
-- [x] CMD_LED_CONTROL
-- [x] CMD_IS_PRESS_FINGER
-- [x] CMD_ENROLL
-- [x] CMD_DELETE_ID
-- [x] CMD_DELETE_ALL
-- [x] CMD_GET_USER_COUNT
-- [x] CMD_IDENTIFY
-- [x] CMD_GET_ENTRY_ID
-- [x] CMD_GET_FIRMWARE_VERSION
-- [x] CMD_ENROLL_CANCEL
-- [x] CMD_UART_CONTROL
+For full documentation and API reference, visit the [Online Wiki](https://lewpar.github.io/gtnucl1633/).
 
-For any unimplemented features you can use `send_command` and `read_response` to fill the gaps.
+## Resources
+- [Programming Guide (PDF)](https://cdn.sparkfun.com/assets/1/4/5/e/7/GT-NUCL1633K1_Programming_guide_V1.3.pdf)
+- [Datasheet (PDF)](https://cdn.sparkfun.com/assets/0/4/f/d/9/GT-nucl1633k1_product_specification_v1.2_20220509.pdf)
 
-## Additional Information
-This is the very helpful programming guide if you are interested in contributing: https://cdn.sparkfun.com/assets/1/4/5/e/7/GT-NUCL1633K1_Programming_guide_V1.3.pdf
-
-Datasheet: https://cdn.sparkfun.com/assets/0/4/f/d/9/GT-nucl1633k1_product_specification_v1.2_20220509.pdf
+## Contributing
+Contributions are welcome! Please see the programming guide above for protocol details.
