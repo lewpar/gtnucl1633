@@ -15,7 +15,7 @@ Checkout [main.py](./main.py) for basic usage.
 - [x] CMD_GET_USER_COUNT
 - [x] CMD_IDENTIFY
 - [x] CMD_GET_ENTRY_ID
-- [ ] CMD_GET_FIRMWARE_VERSION
+- [x] CMD_GET_FIRMWARE_VERSION
 - [ ] CMD_ENROLL_CANCEL
 
 For any unimplemented features you can use `send_command` and `read_response` to fill the gaps.

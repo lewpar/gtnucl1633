@@ -3,20 +3,14 @@ import time
 
 sensor = GTNUCL1633(port="/dev/serial0", baud_rate=115200, debug=False)
 
-# Initialize Sensor
+print ("Initializing sensor..")
 sensor.open()
+print ("> Done\n")
 
-free_id = sensor.get_entry_id()
-
-if free_id < 0:
-    print("Failed to get free id.")
-else:
-    print(f"Got free id: {free_id}")
+print("Fetching firmware information..")
+print(f"> Firmware Version: {sensor.get_firmware_version()}, Release: {sensor.get_firmware_release_date()}\n")
 
 print("Waiting for touch inputs..")
-
-count = sensor.get_user_count()
-print(count)
 
 while True:
     is_finger_touching = sensor.is_press_finger()

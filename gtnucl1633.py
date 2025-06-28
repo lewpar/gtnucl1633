@@ -118,6 +118,27 @@ class GTNUCL1633:
             datetime.date: The firmware release date. Returns `None` if `open` has not been called.
         """
         return self.firmware_release_date
+    
+    def get_firmware_version(self):
+        """
+        Get the firmware version on the sensor.
+
+        Returns:
+            int: The version of the firmware. Returns -1 if command failed.
+        """
+        self.send_command(CMD_GET_FIRMWARE_VERSION)
+        response = self.read_response()
+
+        version_high = response[2]
+        version_low = response[3]
+        ack = response[4]
+
+        if ack != ACK_SUCCESS:
+            return -1
+        
+        version = self.__bytes_to_short(version_high, version_low)
+
+        return version
 
     def open(self):
         """
