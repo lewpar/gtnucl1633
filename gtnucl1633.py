@@ -1,5 +1,6 @@
 import serial
 import datetime
+import time
 
 # Initialize the fingerprint module
 CMD_OPEN = 0xA0
@@ -105,7 +106,7 @@ class GTNUCL1633:
         self.debug = debug
         self.firmware_release_date = None
         self.sensor_type = None
-        self.is_enrolling = False
+        self.is_training = False
         self.last_ack = None
     
     def __bytes_to_short(self, high: int, low: int) -> int:
@@ -226,6 +227,7 @@ class GTNUCL1633:
             print(f"Tx: {payload}")
 
         self.device.write(payload)
+        time.sleep(0.25)
 
     def read_response(self, length=8) -> bytes:
         response = self.device.read(length)
@@ -242,7 +244,7 @@ class GTNUCL1633:
         Returns:
             None:
         """
-        self.send_command(CMD_LED_CONTROL, param1=1)
+        self.send_command(CMD_LED_CONTROL, param1=0x1)
 
         response = self.read_response()
         ack = response[4]
@@ -259,7 +261,7 @@ class GTNUCL1633:
         Returns:
             None:
         """
-        self.send_command(CMD_LED_CONTROL, param1=0)
+        self.send_command(CMD_LED_CONTROL, param1=0x0)
 
         response = self.read_response()
         ack = response[4]
@@ -371,11 +373,11 @@ class GTNUCL1633:
 
         return user_id
     
-    def get_total_enrolment_stages():
+    def get_total_enrolment_stages(self):
         return 8
     
     def is_enrolling(self):
-        return self.is_enrolling
+        return self.is_training
     
     def start_enrolment(self, user_id) -> int:
         """
@@ -395,13 +397,16 @@ class GTNUCL1633:
         if ack != ACK_SUCCESS:
             return False
         
-        self.is_enrolling = True
+        self.is_training = True
         
         return True
     
     def continue_enrolment(self):
         self.send_command(CMD_ENROLL)
         response = self.read_response()
+
+        if len(response) == 0:
+            return (False, 0)
 
         result = response[1]
         progress = response[2]
@@ -410,12 +415,24 @@ class GTNUCL1633:
         self.last_ack = ack
 
         if ack != ACK_SUCCESS:
-            self.is_enrolling = False
-            return (False, 0)
+            if ack == ACK_ENROLL_OVEREXPOSURE:
+                return (False, progress)
+            
+            if ack == ACK_ENROLL_MOVE_MORE:
+                return (False, progress)
+            
+            if ack == ACK_ENROLL_MOVE_LESS:
+                return (False, progress)
+            
+            if ack == ACK_ENROLL_DUPLICATE:
+                return (False, progress)
+            
+            self.is_training = False
+            return (False, progress)
 
         # 0x03 = Final Enrolment Complete
         if result == 0x03:
-            self.is_enrolling = False
+            self.is_training = False
             return (True, progress)
 
         return (True, progress)

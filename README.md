@@ -1,5 +1,5 @@
 # GTNUCL1633 Fingerprint Reader
-A Python module implementation of the GTNUCL1633 Fingerprint Reader.
+Python driver for the GTNUCL1633 Fingerprint Reader.
 
 ## Usage
 Checkout [main.py](./main.py) for basic usage.
