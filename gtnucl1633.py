@@ -1,4 +1,5 @@
 import serial
+import datetime
 
 # Initialize the fingerprint module
 CMD_OPEN = 0xA0
@@ -92,16 +93,70 @@ class GTNUCL1633:
     def __init__(self, port="/dev/serial0", baud_rate=115200, timeout=1, debug=False):
         self.device = serial.Serial(port, baud_rate, timeout=timeout)
         self.debug = debug
+        self.firmware_release_date = None
+        self.sensor_type = None
+    
+    def __bytes_to_short(self, high: int, low: int) -> int:
+        return  (high << 8) | low
+    
+    def get_sensor_type(self) -> None | int:
+        """
+        Get the sensor type fo the GTNUCL1633.
+
+        The documentation is not exactly clear on what the types are.
+
+        Returns:
+            int: The sensor type. Returns `None` if `open` has not been called.
+        """
+        return self.sensor_type
+
+    def get_firmware_release_date(self) -> None | datetime.date:
+        """
+        Get the release date for the firmware on the sensor.
+
+        Returns:
+            datetime.date: The firmware release date. Returns `None` if `open` has not been called.
+        """
+        return self.firmware_release_date
 
     def open(self):
-        self.send_command(CMD_OPEN)
+        """
+        Initializes the touch sensor and fetches the firmware release date and sensor type.
 
-        # Discard the response, as I dont care about the firmware information
-        # If you do care, you need to set the flag (param3) to 1 in send_commands
-        # and handle the data payload properly.
-        _ = self.read_response()
+        Returns:
+            None: 
+        """
+        self.send_command(CMD_OPEN, param3=1)
+
+        response = self.read_response()
+
+        fw_high = response[2]
+        fw_low = response[3]
+
+        # Data length + start code, checksum and end code (3).
+        fw_len = self.__bytes_to_short(fw_high, fw_low) + 3
+
+        fw_response = self.read_response(fw_len)
+
+        day = fw_response[3]
+        month = fw_response[4]
+
+        year_low = fw_response[5]
+        year_high = fw_response[6]
+        year = self.__bytes_to_short(year_high, year_low)
+
+        self.firmware_release_date = datetime.date(year, month, day)
+
+        sensor_type = fw_response[8]
+        self.sensor_type = sensor_type
 
     def close(self):
+        """
+        Terminates the serial communication.
+
+        Returns:
+            None: 
+        """
         self.send_command(CMD_CLOSE)
 
     def send_command(self, command, param1 = 0, param2 = 0, param3 = 0, param4 = 0):
@@ -124,6 +179,12 @@ class GTNUCL1633:
         return response
     
     def switch_led_off(self):
+        """
+        Switches the touch sensor LED off.
+
+        Returns:
+            None:
+        """
         self.send_command(CMD_LED_CONTROL, param1=1)
 
         response = self.read_response()
@@ -133,6 +194,12 @@ class GTNUCL1633:
             print("Failed to switch led off.")
 
     def switch_led_on(self):
+        """
+        Switches the touch sensor LED on.
+        
+        Returns:
+            None:
+        """
         self.send_command(CMD_LED_CONTROL, param1=0)
 
         response = self.read_response()
@@ -142,6 +209,12 @@ class GTNUCL1633:
             print("Failed to switch led on.")
 
     def is_press_finger(self) -> bool:
+        """
+        Checks if a finger is current on the touch sensor.
+
+        Returns:
+            bool: True if a finger is on the sensor.
+        """
         self.send_command(CMD_IS_PRESS_FINGER)
         response = self.read_response()
         status = response[2]
@@ -149,6 +222,12 @@ class GTNUCL1633:
         return status == 1
     
     def get_entry_id(self) -> int:
+        """
+        Gets a free user id for fingerprint training.
+
+        Returns:
+            int: The free id. Returns -1 if the command fails or -2 if the fingerprint database is full.
+        """
         self.send_command(CMD_GET_ENTRY_ID)
         response = self.read_response()
 
@@ -156,7 +235,7 @@ class GTNUCL1633:
 
         if result == ACK_FULL:
             print("Failed to get free id, database full.")
-            return -1
+            return -2
         
         if result != ACK_SUCCESS:
             print("Failed to get free id, command failed.")
