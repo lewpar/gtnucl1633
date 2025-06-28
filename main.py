@@ -33,8 +33,6 @@ print(f"> {sensor.get_entry_id()} is the next available id.\n")
 
 time.sleep(0.1)
 
-print("Waiting for touch inputs..")
-
 def exit_loop():
     global running
     running = False
