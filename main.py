@@ -15,11 +15,16 @@ else:
 
 print("Waiting for touch inputs..")
 
+count = sensor.get_user_count()
+print(count)
+
 while True:
     is_finger_touching = sensor.is_press_finger()
 
     if is_finger_touching:
         sensor.switch_led_on()
+        user_id = sensor.identify()
+        print(f"Identified user id: {user_id}")
     else:
         sensor.switch_led_off()
 

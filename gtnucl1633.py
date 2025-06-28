@@ -272,3 +272,33 @@ class GTNUCL1633:
         count = self.__bytes_to_short(count_high, count_low)
 
         return count
+    
+    def identify(self) -> int:
+        """
+        Identifies the fingerprint (user) currently on the sensor.
+
+        Returns:
+            int: The user id. Returns -1 if no user is found or -2 if the command failed.
+        """
+        self.send_command(CMD_IDENTIFY)
+        response = self.read_response()
+
+        id_high = response[2]
+        id_low = response[3]
+
+        user_id = self.__bytes_to_short(id_high, id_low)
+
+        ack = response[4]
+
+        if user_id == 0:
+            if ack == ACK_NOUSER:
+                print("Failed to identify fingerprint: Not enrolled.")
+                return -1 
+            
+            if ack == ACK_FAIL:
+                print("Failed to identify fingerprint.")
+                return -2
+
+        return user_id
+
+
