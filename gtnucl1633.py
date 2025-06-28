@@ -106,6 +106,7 @@ class GTNUCL1633:
         self.firmware_release_date = None
         self.sensor_type = None
         self.is_enrolling = False
+        self.last_ack = None
     
     def __bytes_to_short(self, high: int, low: int) -> int:
         return  (high << 8) | low
@@ -115,6 +116,14 @@ class GTNUCL1633:
         low = value & 0xFF
         return high, low
 
+    def get_last_acknowledgement(self) -> None | int:
+        """
+        Gets the last acknowledgement received from the sensor.
+
+        Returns:
+            int: The acknowledgement id. Returns `None` if no acknowledgement was received.
+        """
+        return self.last_ack
     
     def get_sensor_type(self) -> None | int:
         """
@@ -149,6 +158,8 @@ class GTNUCL1633:
         len_high = response[2]
         len_low = response[3]
         ack = response[4]
+
+        self.last_ack = ack
 
         if ack != ACK_SUCCESS:
             return -1
@@ -192,6 +203,8 @@ class GTNUCL1633:
         sensor_type = fw_response[8]
         self.sensor_type = sensor_type
 
+        self.last_ack = None
+
     def close(self):
         """
         Terminates the serial communication.
@@ -200,6 +213,8 @@ class GTNUCL1633:
             None: 
         """
         self.send_command(CMD_CLOSE)
+
+        self.last_ack = None
 
     def send_command(self, command, param1 = 0, param2 = 0, param3 = 0, param4 = 0):
         checksum = command ^ param1 ^ param2 ^ param3 ^ param4
@@ -230,9 +245,11 @@ class GTNUCL1633:
         self.send_command(CMD_LED_CONTROL, param1=1)
 
         response = self.read_response()
-        result = response[4]
+        ack = response[4]
 
-        if result != ACK_SUCCESS and self.debug:
+        self.last_ack = ack
+
+        if ack != ACK_SUCCESS and self.debug:
             print("Failed to switch led off.")
 
     def switch_led_on(self):
@@ -245,9 +262,11 @@ class GTNUCL1633:
         self.send_command(CMD_LED_CONTROL, param1=0)
 
         response = self.read_response()
-        result = response[4]
+        ack = response[4]
 
-        if result != ACK_SUCCESS and self.debug:
+        self.last_ack = ack
+
+        if ack != ACK_SUCCESS and self.debug:
             print("Failed to switch led on.")
 
     def is_press_finger(self) -> bool:
@@ -260,6 +279,9 @@ class GTNUCL1633:
         self.send_command(CMD_IS_PRESS_FINGER)
         response = self.read_response()
         status = response[2]
+        ack = response[4]
+
+        self.last_ack = ack
 
         return status == 1
     
@@ -273,13 +295,15 @@ class GTNUCL1633:
         self.send_command(CMD_GET_ENTRY_ID)
         response = self.read_response()
 
-        result = response[4]
+        ack = response[4]
 
-        if result == ACK_FULL:
+        self.last_ack = ack
+
+        if ack == ACK_FULL:
             print("Failed to get free id, database full.")
             return -2
         
-        if result != ACK_SUCCESS:
+        if ack != ACK_SUCCESS:
             print("Failed to get free id, command failed.")
             return -1
         
@@ -301,6 +325,8 @@ class GTNUCL1633:
         response = self.read_response()
 
         ack = response[4]
+
+        self.last_ack = ack
 
         if ack == ACK_NOUSER:
             return -1
@@ -332,6 +358,8 @@ class GTNUCL1633:
 
         ack = response[4]
 
+        self.last_ack = ack
+
         if user_id == 0:
             if ack == ACK_NOUSER:
                 print("Failed to identify fingerprint: Not enrolled.")
@@ -362,6 +390,8 @@ class GTNUCL1633:
         response = self.read_response()
         ack = response[4]
 
+        self.last_ack = ack
+
         if ack != ACK_SUCCESS:
             return False
         
@@ -376,6 +406,8 @@ class GTNUCL1633:
         result = response[1]
         progress = response[2]
         ack = response[4]
+
+        self.last_ack = ack
 
         if ack != ACK_SUCCESS:
             self.is_enrolling = False
@@ -400,6 +432,8 @@ class GTNUCL1633:
         response = self.read_response()
         ack = response[4]
 
+        self.last_ack = ack
+
         if ack != ACK_SUCCESS:
             return False
         
@@ -415,6 +449,8 @@ class GTNUCL1633:
         self.send_command(CMD_DELETE_ALL)
         response = self.read_response()
         ack = response[4]
+
+        self.last_ack = ack
 
         if ack != ACK_SUCCESS:
             return False
