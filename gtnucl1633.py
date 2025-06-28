@@ -480,6 +480,8 @@ class GTNUCL1633:
         """
         Sets the serial baud rate of the sensor.
 
+        Use `gtnucl1633.CMD_UART_CONTROL_BAUD_*` provided by this module as the `baud_id`.
+
         Returns:
             bool: True if command was successful.
         """
