@@ -247,3 +247,28 @@ class GTNUCL1633:
         user_id = (high_byte << 8) | low_byte
 
         return user_id
+    
+    def get_user_count(self) -> int:
+        """
+        Gets the amount of trained finger prints (users).
+
+        Returns:
+            int: The amount of users. Returns -1 if no users or -2 if command fails.
+        """
+        self.send_command(CMD_GET_USER_COUNT)
+        response = self.read_response()
+
+        ack = response[4]
+
+        if ack == ACK_NOUSER:
+            return -1
+        
+        if ack != ACK_SUCCESS:
+            return -2
+        
+        count_high = response[2]
+        count_low = response[3]
+
+        count = self.__bytes_to_short(count_high, count_low)
+
+        return count

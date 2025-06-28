@@ -12,7 +12,7 @@ Checkout [main.py](./main.py) for basic usage.
 - [ ] CMD_ENROLL
 - [ ] CMD_DELETE_ID
 - [ ] CMD_DELETE_ALL
-- [ ] CMD_GET_USER_COUNT
+- [x] CMD_GET_USER_COUNT
 - [ ] CMD_IDENTIFY
 - [x] CMD_GET_ENTRY_ID
 - [ ] CMD_GET_FIRMWARE_VERSION
