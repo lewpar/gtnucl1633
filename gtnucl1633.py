@@ -377,3 +377,20 @@ class GTNUCL1633:
             return (True, progress)
 
         return (True, progress)
+    
+    def cancel_enrollment(self, user_id):
+        """
+        Cancels the enrollment of finger print id (user) and erases it.
+
+        Returns:
+            bool: True if cancel was successful.
+        """
+        (user_high, user_low) = self.__short_to_bytes(user_id)
+        self.send_command(CMD_ENROLL_CANCEL, param1=user_high, param2=user_low)
+        response = self.read_response()
+        ack = response[4]
+
+        if ack != ACK_SUCCESS:
+            return False
+        
+        return True
