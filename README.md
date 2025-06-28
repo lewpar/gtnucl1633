@@ -13,7 +13,7 @@ Checkout [main.py](./main.py) for basic usage.
 - [ ] CMD_DELETE_ID
 - [ ] CMD_DELETE_ALL
 - [x] CMD_GET_USER_COUNT
-- [ ] CMD_IDENTIFY
+- [x] CMD_IDENTIFY
 - [x] CMD_GET_ENTRY_ID
 - [ ] CMD_GET_FIRMWARE_VERSION
 - [ ] CMD_ENROLL_CANCEL
