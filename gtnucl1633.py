@@ -40,12 +40,12 @@ CMD_ENROLL_CANCEL = 0x92
 # Controls the UART BAUD rate
 CMD_UART_CONTROL = 0xA3
 
-CMD_UART_CONTROL_BAUD_9600 = 1
-CMD_UART_CONTROL_BAUD_19200 = 2
-CMD_UART_CONTROL_BAUD_115200 = 3
-CMD_UART_CONTROL_BAUD_230400 = 4
-CMD_UART_CONTROL_BAUD_460800 = 5
-CMD_UART_CONTROL_BAUD_921600 = 6
+CMD_UART_CONTROL_BAUD_9600 = 0x1
+CMD_UART_CONTROL_BAUD_19200 = 0x2
+CMD_UART_CONTROL_BAUD_115200 = 0x3
+CMD_UART_CONTROL_BAUD_230400 = 0x4
+CMD_UART_CONTROL_BAUD_460800 = 0x5
+CMD_UART_CONTROL_BAUD_921600 = 0x6
 
 # Command executed successfully
 ACK_SUCCESS = 0x00
@@ -474,4 +474,28 @@ class GTNUCL1633:
         if ack != ACK_SUCCESS:
             return False
         
+        return True
+    
+    def set_uart_baud(self, baud_id):
+        """
+        Sets the serial baud rate of the sensor.
+
+        Returns:
+            bool: True if command was successful.
+        """
+
+        if len(baud_id) > 1:
+            self.last_ack = None
+            raise Exception("baud_id was more than expected length of 1")
+
+        self.send_command(CMD_UART_CONTROL, param1=baud_id)
+        response = self.read_response()
+
+        ack = response[4]
+
+        self.last_ack = ack
+
+        if ack != ACK_SUCCESS:
+            return False
+
         return True
