@@ -122,7 +122,7 @@ class GTNUCL1633:
         Gets the last acknowledgement received from the sensor.
 
         Returns:
-            int: The acknowledgement id. Returns `None` if no acknowledgement was received.
+            (None | int): The acknowledgement id. Returns `None` if no acknowledgement was received.
         """
         return self.last_ack
     
@@ -133,7 +133,7 @@ class GTNUCL1633:
         The documentation is not exactly clear on what the types are.
 
         Returns:
-            int: The sensor type. Returns `None` if `open` has not been called.
+            (None | int): The sensor type. Returns `None` if `open` has not been called.
         """
         return self.sensor_type
 
@@ -142,16 +142,16 @@ class GTNUCL1633:
         Get the release date for the firmware on the sensor.
 
         Returns:
-            datetime.date: The firmware release date. Returns `None` if `open` has not been called.
+            (None | datetime.date): The firmware release date. Returns `None` if `open` has not been called.
         """
         return self.firmware_release_date
     
-    def get_firmware_version(self):
+    def get_firmware_version(self) -> None | int:
         """
         Get the firmware version on the sensor.
 
         Returns:
-            int: The version of the firmware. Returns -1 if command failed.
+            (None | int): The version of the firmware. Returns `None` if command failed.
         """
         self.send_command(CMD_GET_FIRMWARE_VERSION)
         response = self.read_response()
@@ -163,7 +163,7 @@ class GTNUCL1633:
         self.last_ack = ack
 
         if ack != ACK_SUCCESS:
-            return -1
+            return None
         
         # Version Data length + start code, checksum and end code (3 bytes).
         data_len = self.__bytes_to_short(len_high, len_low) + 3
@@ -287,12 +287,12 @@ class GTNUCL1633:
 
         return status == 1
     
-    def get_entry_id(self) -> int:
+    def get_entry_id(self) -> None | int:
         """
         Gets a free user id for fingerprint training.
 
         Returns:
-            int: The free id. Returns -1 if the command fails or -2 if the fingerprint database is full.
+            (int | None): The free id. Returns `None` if the command fails or the fingerprint database is full.
         """
         self.send_command(CMD_GET_ENTRY_ID)
         response = self.read_response()
@@ -301,13 +301,8 @@ class GTNUCL1633:
 
         self.last_ack = ack
 
-        if ack == ACK_FULL:
-            print("Failed to get free id, database full.")
-            return -2
-        
         if ack != ACK_SUCCESS:
-            print("Failed to get free id, command failed.")
-            return -1
+            return None
         
         high_byte = response[2]
         low_byte = response[3]
@@ -316,12 +311,12 @@ class GTNUCL1633:
 
         return user_id
     
-    def get_user_count(self) -> int:
+    def get_user_count(self) -> None | int:
         """
         Gets the amount of trained finger prints (users).
 
         Returns:
-            int: The amount of users. Returns -1 if no users or -2 if command fails.
+            (None | int): The amount of users. Returns `None` if no users or the command fails.
         """
         self.send_command(CMD_GET_USER_COUNT)
         response = self.read_response()
@@ -329,12 +324,9 @@ class GTNUCL1633:
         ack = response[4]
 
         self.last_ack = ack
-
-        if ack == ACK_NOUSER:
-            return -1
         
         if ack != ACK_SUCCESS:
-            return -2
+            return None
         
         count_high = response[2]
         count_low = response[3]
@@ -343,12 +335,12 @@ class GTNUCL1633:
 
         return count
     
-    def identify(self) -> int:
+    def identify(self) -> None | int:
         """
         Identifies the fingerprint (user) currently on the sensor.
 
         Returns:
-            int: The user id. Returns -1 if no user is found or -2 if the command failed.
+            (None | int): The user id. Returns `None` if no user is found or the command failed.
         """
         self.send_command(CMD_IDENTIFY)
         response = self.read_response()
@@ -364,12 +356,10 @@ class GTNUCL1633:
 
         if user_id == 0:
             if ack == ACK_NOUSER:
-                print("Failed to identify fingerprint: Not enrolled.")
-                return -1 
+                return None
             
             if ack == ACK_FAIL:
-                print("Failed to identify fingerprint.")
-                return -2
+                return None
 
         return user_id
     
