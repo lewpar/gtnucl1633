@@ -11,7 +11,7 @@ A Python driver for the GTNUCL1633 Fingerprint Reader.
 ## Usage
 See [main.py](./main.py) for a basic usage example.
 
-For full documentation and API reference, visit the [Online Wiki](https://lewpar.github.io/gtnucl1633/).
+For full documentation and API reference, visit the [Online Wiki](https://lewpar.github.io/gtnucl1633/#/overview).
 
 ## Resources
 - [Programming Guide (PDF)](https://cdn.sparkfun.com/assets/1/4/5/e/7/GT-NUCL1633K1_Programming_guide_V1.3.pdf)
