@@ -456,3 +456,22 @@ class GTNUCL1633:
             return False
         
         return True
+    
+    def delete_user(self, user_id):
+        """
+        Deletes the finger print id (user) from the sensor.
+
+        Returns:
+            bool: True if cancel was successful.
+        """
+        (user_high, user_low) = self.__short_to_bytes(user_id)
+        self.send_command(CMD_DELETE_ID, param1=user_high, param2=user_low)
+        response = self.read_response()
+        ack = response[4]
+
+        self.last_ack = ack
+
+        if ack != ACK_SUCCESS:
+            return False
+        
+        return True

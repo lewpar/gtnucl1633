@@ -9,8 +9,8 @@ Checkout [main.py](./main.py) for basic usage.
 - [x] CMD_CLOSE
 - [x] CMD_LED_CONTROL
 - [x] CMD_IS_PRESS_FINGER
-- [ ] CMD_ENROLL
-- [ ] CMD_DELETE_ID
+- [x] CMD_ENROLL
+- [x] CMD_DELETE_ID
 - [x] CMD_DELETE_ALL
 - [x] CMD_GET_USER_COUNT
 - [x] CMD_IDENTIFY
