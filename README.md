@@ -22,3 +22,5 @@ For any unimplemented features you can use `send_command` and `read_response` to
 
 ## Additional Information
 This is the very helpful programming guide if you are interested in contributing: https://cdn.sparkfun.com/assets/1/4/5/e/7/GT-NUCL1633K1_Programming_guide_V1.3.pdf
+
+Datasheet: https://cdn.sparkfun.com/assets/0/4/f/d/9/GT-nucl1633k1_product_specification_v1.2_20220509.pdf

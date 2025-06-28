@@ -95,9 +95,16 @@ class GTNUCL1633:
         self.debug = debug
         self.firmware_release_date = None
         self.sensor_type = None
+        self.is_enrolling = False
     
     def __bytes_to_short(self, high: int, low: int) -> int:
         return  (high << 8) | low
+
+    def __short_to_bytes(self, value: int) -> tuple[int, int]:
+        high = (value >> 8) & 0xFF
+        low = value & 0xFF
+        return high, low
+
     
     def get_sensor_type(self) -> None | int:
         """
@@ -129,14 +136,18 @@ class GTNUCL1633:
         self.send_command(CMD_GET_FIRMWARE_VERSION)
         response = self.read_response()
 
-        version_high = response[2]
-        version_low = response[3]
+        len_high = response[2]
+        len_low = response[3]
         ack = response[4]
 
         if ack != ACK_SUCCESS:
             return -1
         
-        version = self.__bytes_to_short(version_high, version_low)
+        # Version Data length + start code, checksum and end code (3 bytes).
+        data_len = self.__bytes_to_short(len_high, len_low) + 3
+        version_data = self.read_response(data_len)
+
+        version = version_data[5]
 
         return version
 
@@ -154,7 +165,7 @@ class GTNUCL1633:
         fw_high = response[2]
         fw_low = response[3]
 
-        # Data length + start code, checksum and end code (3).
+        # Data length + start code, checksum and end code (3 bytes).
         fw_len = self.__bytes_to_short(fw_high, fw_low) + 3
 
         fw_response = self.read_response(fw_len)
@@ -321,5 +332,48 @@ class GTNUCL1633:
                 return -2
 
         return user_id
+    
+    def get_total_enrolment_stages():
+        return 8
+    
+    def is_enrolling(self):
+        return self.is_enrolling
+    
+    def start_enrolment(self, user_id) -> int:
+        """
+        Starts the enrolment / training process for a fingerprint (user).
 
+        Returns:
+            bool: Returns `True` on success.
+        """
+        (user_high, user_low) = self.__short_to_bytes(user_id)
+        self.send_command(CMD_ENROLL, param1=user_high, param2=user_low)
 
+        response = self.read_response()
+        ack = response[4]
+
+        if ack != ACK_SUCCESS:
+            return False
+        
+        self.is_enrolling = True
+        
+        return True
+    
+    def continue_enrolment(self):
+        self.send_command(CMD_ENROLL)
+        response = self.read_response()
+
+        result = response[1]
+        progress = response[2]
+        ack = response[4]
+
+        if ack != ACK_SUCCESS:
+            self.is_enrolling = False
+            return (False, 0)
+
+        # 0x03 = Final Enrolment Complete
+        if result == 0x03:
+            self.is_enrolling = False
+            return (True, progress)
+
+        return (True, progress)
