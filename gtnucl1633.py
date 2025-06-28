@@ -394,3 +394,19 @@ class GTNUCL1633:
             return False
         
         return True
+
+    def delete_all_users(self):
+        """
+        Deletes all fingerprints (users) stored on the fingerprint sensor.
+
+        Returns:
+            bool: True if delete was successful.
+        """
+        self.send_command(CMD_DELETE_ALL)
+        response = self.read_response()
+        ack = response[4]
+
+        if ack != ACK_SUCCESS:
+            return False
+        
+        return True
