@@ -69,9 +69,30 @@ def train_finger():
             ack = sensor.get_last_acknowledgement()
             print(f"Failed to enrol, terminating enrolment. ACK: {sensor.get_ack_message(ack)}")
 
+def test_finger():
+    is_finger_touching = sensor.is_press_finger()
+
+    if not is_finger_touching:
+        print("Place your finger on the sensor to begin.")
+
+    while not sensor.is_press_finger():
+        time.sleep(0.1)
+
+    print("Identifying fingerprint, please leave your finger on the sensor..")
+    sensor.switch_led_on()
+    user_id = sensor.identify()
+    sensor.switch_led_off()
+
+    if user_id < 0:
+        print("No identity found\n")
+
+        return
+    print(f"Identified user: {user_id}")
+
 menu = {
     1: MenuItem("Train Finger", train_finger),
-    2: MenuItem("Exit", exit_loop)
+    2: MenuItem("Test Finger", test_finger),
+    3: MenuItem("Exit", exit_loop)
 }
 
 def get_selection(prompt: str) -> None | int:
