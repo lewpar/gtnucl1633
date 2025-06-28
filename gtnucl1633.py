@@ -402,6 +402,16 @@ class GTNUCL1633:
         return True
     
     def continue_enrolment(self):
+        """
+        Continues the enrolment process for a fingerprint (user).
+        Returns:
+            (bool, int): Returns a tuple indicating if the enrolment step was successful and the enrolment step progress.
+        """
+        if not self.is_training:
+            if self.debug:
+                print("You must start an enrolment before you can continue one.")
+            return
+        
         self.send_command(CMD_ENROLL)
         response = self.read_response()
 
