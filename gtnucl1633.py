@@ -102,6 +102,15 @@ ACK_ENROLL_POOR_QUALITY = 0xBA
 
 class GTNUCL1633:
     def __init__(self, port="/dev/serial0", baud_rate=115200, timeout=1, debug=False):
+        """
+        Initialize the GTNUCL1633 fingerprint sensor interface.
+
+        Parameters:
+            port (str): Serial port to use for communication.
+            baud_rate (int): Baud rate for serial communication.
+            timeout (float): Read timeout for serial communication.
+            debug (bool): If True, prints debug information.
+        """
         self.device = serial.Serial(port, baud_rate, timeout=timeout)
         self.debug = debug
         self.firmware_release_date = None
@@ -110,12 +119,64 @@ class GTNUCL1633:
         self.last_ack = None
     
     def __bytes_to_short(self, high: int, low: int) -> int:
+        """
+        Convert two bytes (high and low) into a single 16-bit integer.
+
+        Parameters:
+            high (int): High byte.
+            low (int): Low byte.
+
+        Returns:
+            int: The combined 16-bit integer.
+        """
         return  (high << 8) | low
 
     def __short_to_bytes(self, value: int) -> tuple[int, int]:
+        """
+        Convert a 16-bit integer into two separate bytes.
+
+        Parameters:
+            value (int): A 16-bit integer value.
+
+        Returns:
+            tuple[int, int]: A tuple of (high_byte, low_byte).
+        """
         high = (value >> 8) & 0xFF
         low = value & 0xFF
         return high, low
+    
+    def get_ack_message(self, ack):
+        """
+        Return a descriptive message string corresponding to a given ACK code.
+
+        Parameters:
+            ack (int): The ACK code to look up (e.g., ACK_SUCCESS, ACK_FAIL, etc.).
+
+        Returns:
+            str: A human-readable message describing the result of a fingerprint command.
+                Returns "Unknown ACK code" if the code is not recognized.
+        """
+        ack_messages = {
+            ACK_SUCCESS: "Command executed successfully",
+            ACK_FAIL: "Command execution failed",
+            ACK_FULL: "The fingerprint database is full",
+            ACK_NOUSER: "The specified ID is not registered",
+            ACK_USER_EXIST: "The specified ID is already registered",
+            ACK_TIMEOUT: "Timeout occurred while capturing the finger",
+            ACK_WRONG_FORMAT: "The fingerprint template has a wrong format",
+            ACK_BREAK: "Command was aborted",
+            ACK_INVALID_PARAMETER: "An invalid parameter was provided",
+            ACK_FINGER_IS_NOT_PRESSED: "Finger is not pressed on the sensor",
+            ACK_COMMAND_NO_SUPPORT: "Command is not supported by the device",
+            ACK_ENROLL_OVEREXPOSURE: "Finger image is overexposed during enrollment",
+            ACK_ENROLL_MOVE_MORE: "Finger moved too little during enrollment",
+            ACK_ENROLL_MOVE_LESS: "Finger moved too much during enrollment",
+            ACK_ENROLL_DUPLICATE: "Duplicate finger position detected during enrollment",
+            ACK_FINGER_PRESS_NOT_FULL: "Finger was not fully pressed on the sensor",
+            ACK_ENROLL_POOR_QUALITY: "Finger image quality is too poor for enrollment",
+        }
+
+        return ack_messages.get(ack, "Unknown ACK code")
 
     def get_last_acknowledgement(self) -> None | int:
         """

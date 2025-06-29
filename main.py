@@ -1,7 +1,7 @@
-from gtnucl1633 import GTNUCL1633
+import gtnucl1633
 import time
 
-sensor = GTNUCL1633(port="/dev/serial0", 
+sensor = gtnucl1633.GTNUCL1633(port="/dev/serial0", 
                     baud_rate=115200, 
                     debug=False)
 
@@ -67,7 +67,16 @@ def train_finger():
 
         if not enrol_result:
             ack = sensor.get_last_acknowledgement()
-            print(f"Failed to enrol, terminating enrolment. ACK: {sensor.get_ack_message(ack)}")
+            if ack == gtnucl1633.ACK_FAIL or \
+                ack == gtnucl1633.ACK_USER_EXIST or \
+                ack == gtnucl1633.ACK_INVALID_PARAMETER:
+                sensor.cancel_enrollment(free_user_id)
+                print(f"Failed enrollment: {sensor.get_ack_message(ack)}")
+                return
+
+            print(f"Enrolment Acknowledgement: {sensor.get_ack_message(ack)}")
+
+    print("finished enrolling fingerprint")
 
 def test_finger():
     is_finger_touching = sensor.is_press_finger()
